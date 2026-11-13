@@ -1,5 +1,54 @@
+# --- Сборка (Qt Creator / CMake) ---
 build/
 build-*/
-*.user
+cmake-build-*/
+out/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
 CMakeLists.txt.user*
+CMakeUserPresets.json
+compile_commands.json
+.cache/
+
+# --- Qt Creator: личные настройки ---
 .qtcreator/
+*.user
+*.user.*
+*.autosave
+*.pro.user*
+*.qmlproject.user*
+
+# --- Результаты сборки Qt ---
+*.qmlc
+*.jsc
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+*.pdb
+*.ilk
+*.exp
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+*_qmltyperegistrations.cpp
+.rcc/
+.moc/
+.uic/
+.qmlcache/
+
+# --- Редакторы / IDE ---
+.vscode/
+.idea/
+*.swp
+*~
+
+# --- Системные файлы ---
+.DS_Store
+Thumbs.db
+Desktop.ini
