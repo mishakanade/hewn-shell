@@ -34,6 +34,9 @@ ApplicationWindow {
 
         activeWorkspace: window.activeWorkspace
         onWorkspaceClicked: (number) => window.activeWorkspace = number
+
+        mediaText: "Test Song — Artist"
+        mediaPlaying: true
     }
 
 

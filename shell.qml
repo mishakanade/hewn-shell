@@ -5,8 +5,12 @@ import Quickshell.Services.Pipewire
 
 import Quickshell.Hyprland
 
+import Quickshell.Services.Mpris
+
 ShellRoot {
     id: root
+
+    readonly property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
 
     SystemClock {
         id: clock
@@ -70,6 +74,15 @@ ShellRoot {
                                           audio.volume = Math.max(0, Math.min(1, audio.volume + step))
                                       }
                                 }
+
+            mediaText: root.player ? root.player.trackTitle + " — " + root.player.trackArtist : ""
+            mediaPlaying: root.player ? root.player.isPlaying : false
+            onMediaClicked: {
+                const p = root.player
+                if (p) {
+                    p.togglePlaying()
+                }
+            }
         }
     }
 
@@ -77,15 +90,26 @@ ShellRoot {
         anchors {
             right: true
         }
-        visible: root.osdVisible
-
-        implicitHeight: 200
         implicitWidth: 40
+        implicitHeight: 200
         color: "transparent"
         exclusionMode: ExclusionMode.Ignore
 
+        visible: root.osdVisible || slideAnim.running
+
         VolumeBar {
-            anchors.fill: parent
+            width: parent.width
+            height: parent.height
+            x: root.osdVisible ? 0 : parent.width
+
+            Behavior on x {
+                NumberAnimation {
+                    id: slideAnim
+                    duration: 200
+                    easing.type: Easing.OutCubic
+                }
+            }
+
             volume: Pipewire.defaultAudioSink?.audio?.volume ?? 0
             muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
         }

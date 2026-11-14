@@ -21,6 +21,13 @@ Rectangle {
     required property real volume
     required property bool muted
 
+    signal mediaClicked()
+
+
+    required property string mediaText
+    required property bool mediaPlaying
+
+
 
     Row {
         spacing: 10
@@ -50,6 +57,7 @@ Rectangle {
     }
 
     Text {
+        id: clocktext
         anchors.centerIn: parent
 
         color: "#ffffff"
@@ -85,5 +93,22 @@ Rectangle {
         color: "#ffffff"
 
         text: Qt.formatDate(clockcard.timenow, "dd.MM.yyyy")
+    }
+
+    Text {
+        anchors.right: clocktext.left
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.rightMargin: 30
+
+        color: "#ffffff"
+        text: clockcard.mediaText
+        visible: clockcard.mediaText !== ""
+        elide: Text.ElideRight
+        width: Math.min(implicitWidth, 300)
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: clockcard.mediaClicked()
+        }
     }
 }
