@@ -16,6 +16,28 @@ ShellRoot {
         objects: [ Pipewire.defaultAudioSink ]
     }
 
+    property bool osdVisible: false
+
+    Connections {
+        target: Pipewire.defaultAudioSink?.audio
+
+        function onVolumeChanged() {
+            root.osdVisible = true
+            osdTimer.restart()
+        }
+
+        function onMutedChanged() {
+            root.osdVisible = true
+            osdTimer.restart()
+        }
+    }
+
+    Timer {
+        id: osdTimer
+        interval: 1500
+        onTriggered: root.osdVisible = false
+    }
+
     PanelWindow {
         anchors {
             top: true
@@ -48,6 +70,24 @@ ShellRoot {
                                           audio.volume = Math.max(0, Math.min(1, audio.volume + step))
                                       }
                                 }
+        }
+    }
+
+    PanelWindow {
+        anchors {
+            right: true
+        }
+        visible: root.osdVisible
+
+        implicitHeight: 200
+        implicitWidth: 40
+        color: "transparent"
+        exclusionMode: ExclusionMode.Ignore
+
+        VolumeBar {
+            anchors.fill: parent
+            volume: Pipewire.defaultAudioSink?.audio?.volume ?? 0
+            muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
         }
     }
 }
