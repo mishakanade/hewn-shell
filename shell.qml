@@ -33,6 +33,21 @@ ShellRoot {
 
             volume: Pipewire.defaultAudioSink?.audio?.volume ?? 0
             muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+
+
+            onMuteClicked: {
+                const audio = Pipewire.defaultAudioSink?.audio
+                    if (audio) {
+                        audio.muted = !audio.muted
+                    }
+            }
+            onVolumeScrolled: (delta) =>  {
+                                  const audio = Pipewire.defaultAudioSink?.audio
+                                      if (audio) {
+                                          const step = delta > 0 ? 0.05 : -0.05
+                                          audio.volume = Math.max(0, Math.min(1, audio.volume + step))
+                                      }
+                                }
         }
     }
 }

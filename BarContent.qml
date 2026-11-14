@@ -13,6 +13,9 @@ Rectangle {
 
     signal workspaceClicked(int number)
 
+    signal muteClicked()
+    signal volumeScrolled(int delta)
+
 
 
     required property real volume
@@ -60,6 +63,14 @@ Rectangle {
 
         color: "#ffffff"
         text: clockcard.muted ? "mute": Math.round(clockcard.volume * 100) + "%"
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                clockcard.muteClicked()
+            }
+            onWheel: (wheel) => clockcard.volumeScrolled(wheel.angleDelta.y)
+        }
 
     }
 
