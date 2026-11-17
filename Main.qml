@@ -14,7 +14,7 @@ ApplicationWindow {
 
     property date now: new Date()
 
-    property int activeWorkspace
+    property int activeWorkspace: 1
 
     Timer {
         id: timer
@@ -31,6 +31,9 @@ ApplicationWindow {
         timenow: window.now
         width: parent.width
 
+        volume: 0.5
+        muted: false
+
 
         activeWorkspace: window.activeWorkspace
         onWorkspaceClicked: (number) => window.activeWorkspace = number
@@ -39,5 +42,28 @@ ApplicationWindow {
         mediaPlaying: true
     }
 
+
+    ListModel {
+        id: windowsModel
+        ListElement { title: "Firefox"; appId: "firefox"; active: true }
+        ListElement { title: "Terminal"; appId: "fish"; active: false }
+        ListElement { title: "Spotify"; appId: "spotify"; active: false }
+        ListElement { title: "Claude"; appId: "claude"; active: false }
+    }
+
+    Taskbar {
+        windows: windowsModel
+        isCircled: true
+
+        anchors.bottom: parent.bottom
+        width: parent.width
+
+
+        onWindowClicked: (index) => {
+            for (let i = 0; i < windowsModel.count; i++) {
+                windowsModel.setProperty(i, "active", i === index)
+            }
+        }
+    }
 
 }
