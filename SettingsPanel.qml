@@ -8,9 +8,11 @@ Rectangle {
     width: 700
     height: 450
     radius: 12
-    color: "#111111"
+    color: panel.theme.bg
 
     property int currentTab: 0
+    required property var settings
+    required property var theme
 
     ListModel {
         id: tabsModel
@@ -40,14 +42,11 @@ Rectangle {
                 width: sidebar.width
                 height: 36
                 radius: 8
-                color: panel.currentTab === index
-                       ? Qt.lighter(panel.color, 3.0)
-                       : Qt.lighter(panel.color, 1.8)
-
+                color: panel.currentTab === index ? panel.theme.surface : panel.theme.bg
                 Text {
+                    color: panel.theme.text
                     anchors.centerIn: parent
                     text: title
-                    color: "white"
                 }
 
                 MouseArea {
@@ -68,8 +67,15 @@ Rectangle {
         currentIndex: panel.currentTab
 
         Rectangle { color: "#222222"; Text { anchors.centerIn: parent; color: "white"; text: "About System" } }
-        ThemePage { }
-        Rectangle { color: "#222222"; Text { anchors.centerIn: parent; color: "white"; text: "Statusbar" } }
-        Rectangle { color: "#222222"; Text { anchors.centerIn: parent; color: "white"; text: "Taskbar" } }
+        ThemePage {
+            settings: panel.settings
+            theme: panel.theme
+        }
+        StatusbarPage {
+            settings: panel.settings
+        }
+        TaskbarPage {
+            settings: panel.settings
+        }
     }
 }

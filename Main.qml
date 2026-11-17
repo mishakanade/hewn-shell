@@ -31,12 +31,19 @@ ApplicationWindow {
         id: settings
     }
 
+    Theme {
+        id: theme
+        dark: settings.darkTheme
+    }
+
     BarContent {
         timenow: window.now
         width: parent.width
 
         volume: 0.5
         muted: false
+
+        rounded: settings.statusbarRounded
 
 
         activeWorkspace: window.activeWorkspace
@@ -73,6 +80,8 @@ ApplicationWindow {
 
     SettingsPanel {
         anchors.centerIn: parent
+        settings: settings
+        theme: theme
     }
 
 }

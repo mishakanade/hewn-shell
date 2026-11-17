@@ -7,7 +7,6 @@ Rectangle {
     color: "#000000"
     implicitHeight: 40
     required property date timenow
-    radius: 4
 
     required property int activeWorkspace
 
@@ -26,6 +25,10 @@ Rectangle {
 
     required property string mediaText
     required property bool mediaPlaying
+
+
+    property bool rounded: false
+    radius: rounded ? 12 : 0
 
 
 
