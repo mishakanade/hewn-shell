@@ -39,17 +39,29 @@ Rectangle {
         Repeater {
             model: 4
 
-            delegate: Button {
+            delegate: Rectangle {
                 required property int index
                 readonly property int number: index + 1
 
                 width: 30
                 height: 25
+                radius: 7
+                color: clockcard.activeWorkspace === number
+                       ? "#f5f5f5"
+                       : (hoverArea.containsMouse ? "#a0a0a0" : "#808080")
 
-                text: number
-                highlighted: clockcard.activeWorkspace == number
-                onClicked: clockcard.workspaceClicked(number)
+                Text {
+                    anchors.centerIn: parent
+                    text: parent.number
+                }
 
+                MouseArea {
+                    id: hoverArea
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: clockcard.workspaceClicked(number)
+                }
             }
 
         }
