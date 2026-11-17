@@ -3,7 +3,8 @@ import QtQuick
 Rectangle {
     id: page
     required property var settings
-    color: "#222222"
+    required property var theme
+    color: page.theme.surface
 
     Row {
         x: 20
@@ -12,7 +13,7 @@ Rectangle {
 
         Text {
             text: "Rounded corners"
-            color: "white"
+            color: page.theme.surface
             height: 24
             verticalAlignment: Text.AlignVCenter
         }

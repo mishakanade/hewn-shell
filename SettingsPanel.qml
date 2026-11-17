@@ -76,6 +76,7 @@ Rectangle {
         }
         TaskbarPage {
             settings: panel.settings
+            theme: panel.theme
         }
     }
 }
