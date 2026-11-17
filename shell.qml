@@ -7,6 +7,8 @@ import Quickshell.Hyprland
 
 import Quickshell.Services.Mpris
 
+import Quickshell.Io
+
 ShellRoot {
     id: root
 
@@ -112,6 +114,41 @@ ShellRoot {
 
             volume: Pipewire.defaultAudioSink?.audio?.volume ?? 0
             muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+        }
+    }
+
+    Settings { id: appSettings }
+
+    Theme {
+        id: appTheme
+        dark: appSettings.darkTheme
+    }
+
+    property bool settingsOpen: false
+
+    LazyLoader {
+        active: root.settingsOpen
+
+        FloatingWindow {
+            title: "Hewn Settings"
+            color: appTheme.bg
+            implicitWidth: 700
+            implicitHeight: 450
+            onClosed: root.settingsOpen = false
+
+            SettingsPanel {
+                anchors.fill: parent
+                settings: appSettings
+                theme: appTheme
+            }
+        }
+    }
+
+    IpcHandler {
+        target: "settings"
+
+        function toggle(): void {
+            root.settingsOpen = !root.settingsOpen
         }
     }
 }
