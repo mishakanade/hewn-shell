@@ -20,22 +20,34 @@ Rectangle {
 
     Row {
         spacing: 17
-        padding: 10
-
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: 10
 
         Repeater{
             model: taskbar.windows
 
-            delegate: Button {
+            delegate: Rectangle {
                 required property int index
                 required property string title
                 required property bool active
 
-                text: title
-                highlighted: active
+                width: 140
+                height: 28
+                radius: 7
+                color: active ? "#f5f5f5" : "#808080"
 
-                onClicked: {
-                    windowClicked(index)
+                Text {
+                    anchors.centerIn: parent
+                    width: parent.width - 16
+                    text: title
+                    elide: Text.ElideRight
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: taskbar.windowClicked(index)
                 }
             }
         }
