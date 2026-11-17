@@ -27,6 +27,10 @@ ApplicationWindow {
         }
     }
 
+    Settings {
+        id: settings
+    }
+
     BarContent {
         timenow: window.now
         width: parent.width
@@ -53,7 +57,7 @@ ApplicationWindow {
 
     Taskbar {
         windows: windowsModel
-        isCircled: true
+        isCircled: settings.taskbarRounded
 
         anchors.bottom: parent.bottom
         width: parent.width
@@ -64,6 +68,11 @@ ApplicationWindow {
                 windowsModel.setProperty(i, "active", i === index)
             }
         }
+    }
+
+
+    SettingsPanel {
+        anchors.centerIn: parent
     }
 
 }
