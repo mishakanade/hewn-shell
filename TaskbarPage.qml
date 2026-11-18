@@ -13,7 +13,7 @@ Rectangle {
 
         Text {
             text: "Rounded corners"
-            color: page.theme.surface
+            color: page.theme.text
             height: 24
             verticalAlignment: Text.AlignVCenter
         }

@@ -31,6 +31,7 @@ qt_add_qml_module(apptask1
         QML_FILES ToggleSwitch.qml
         QML_FILES StatusbarPage.qml
         QML_FILES Theme.qml
+        shell.qml
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -73,6 +73,7 @@ Rectangle {
         }
         StatusbarPage {
             settings: panel.settings
+            theme: panel.theme
         }
         TaskbarPage {
             settings: panel.settings
