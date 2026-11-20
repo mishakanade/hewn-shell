@@ -14,7 +14,22 @@ import Quickshell.Wayland
 ShellRoot {
     id: root
 
-    readonly property var player: Mpris.players.values.length > 0 ? Mpris.players.values[0] : null
+    // Какой плеер считать активным: Spotify, если играет; иначе любой играющий;
+    // иначе Spotify (если запущен); иначе первый в списке
+    property var activePlayer: {
+        const players = Mpris.players.values
+        let spotify = null
+        let playing = null
+        for (const p of players) {
+            if (p.desktopEntry === "spotify" || p.identity === "Spotify") spotify = p
+            if (p.isPlaying && !playing) playing = p
+        }
+        if (spotify && spotify.isPlaying) return spotify
+        if (playing) return playing
+        return spotify ?? players[0] ?? null
+    }
+
+    readonly property var player: root.activePlayer
 
     SystemClock {
         id: clock
@@ -27,7 +42,7 @@ ShellRoot {
     property bool osdVisible: false
 
     Connections {
-        target: Pipewire.defaultAudioSink?.audio
+        target: Pipewire.defaultAudioSink?.audio ?? null
 
         function onVolumeChanged() {
             root.osdVisible = true
@@ -46,6 +61,7 @@ ShellRoot {
         onTriggered: root.osdVisible = false
     }
 
+    // ===== Верхняя панель (статусбар) =====
     PanelWindow {
         anchors {
             top: true
@@ -56,28 +72,27 @@ ShellRoot {
 
         BarContent {
             anchors.fill: parent
+            rounded: appSettings.statusbarRounded
             timenow: clock.date                      // откуда брать время?
             activeWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id: 1      // откуда брать номер стола?
             onWorkspaceClicked: (number) => Hyprland.dispatch("hl.dsp.focus({ workspace = " + number + " })")  // что сделать при клике?
 
-
             volume: Pipewire.defaultAudioSink?.audio?.volume ?? 0
             muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
 
-
             onMuteClicked: {
                 const audio = Pipewire.defaultAudioSink?.audio
-                    if (audio) {
-                        audio.muted = !audio.muted
-                    }
+                if (audio) {
+                    audio.muted = !audio.muted
+                }
             }
-            onVolumeScrolled: (delta) =>  {
-                                  const audio = Pipewire.defaultAudioSink?.audio
-                                      if (audio) {
-                                          const step = delta > 0 ? 0.05 : -0.05
-                                          audio.volume = Math.max(0, Math.min(1, audio.volume + step))
-                                      }
-                                }
+            onVolumeScrolled: (delta) => {
+                const audio = Pipewire.defaultAudioSink?.audio
+                if (audio) {
+                    const step = delta > 0 ? 0.05 : -0.05
+                    audio.volume = Math.max(0, Math.min(1, audio.volume + step))
+                }
+            }
 
             mediaText: root.player ? root.player.trackTitle + " — " + root.player.trackArtist : ""
             mediaPlaying: root.player ? root.player.isPlaying : false
@@ -90,6 +105,7 @@ ShellRoot {
         }
     }
 
+    // ===== OSD громкости (справа) =====
     PanelWindow {
         anchors {
             right: true
@@ -119,19 +135,7 @@ ShellRoot {
         }
     }
 
-    property var activePlayer: {
-        const players = Mpris.players.values
-        let spotify = null
-        let playing = null
-        for (const p of players) {
-            if (p.desktopEntry === "spotify" || p.identity === "Spotify") spotify = p
-            if (p.isPlaying && !playing) playing = p
-        }
-        if (spotify && spotify.isPlaying) return spotify
-        if (playing) return playing
-        return spotify ?? players[0] ?? null
-    }
-
+    // ===== Таскбар (снизу) =====
     PanelWindow {
         anchors {
             left: true
@@ -151,6 +155,7 @@ ShellRoot {
                 spacing: 12
                 anchors.verticalCenter: parent.verticalCenter
 
+                // основные окна
                 Repeater {
                     model: Hyprland.toplevels
 
@@ -158,16 +163,17 @@ ShellRoot {
                         required property var modelData
                         visible: !(modelData.workspace?.name ?? "").startsWith("special:")
                         title: modelData.title
+                        active: modelData.activated
+                        showText: appSettings.taskbarTextVisible
                         onClicked: modelData.wayland?.activate()
                         icon: {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
                         }
-
-                        showText: appSettings.taskbarTextVisible
                     }
                 }
 
+                // разделитель
                 Rectangle {
                     width: 2
                     height: 20
@@ -176,6 +182,7 @@ ShellRoot {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
+                // окна из special-воркспейсов
                 Repeater {
                     model: Hyprland.toplevels
 
@@ -184,19 +191,19 @@ ShellRoot {
                         visible: (modelData.workspace?.name ?? "").startsWith("special:")
                         title: modelData.title
                         active: modelData.activated
+                        showText: appSettings.taskbarTextVisible
                         onClicked: modelData.wayland?.activate()
                         icon: {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
                         }
-
-                        showText: appSettings.taskbarTextVisible
                     }
                 }
             }
         }
     }
 
+    // ===== Настройки и тема =====
     Settings { id: appSettings }
 
     Theme {
@@ -204,6 +211,40 @@ ShellRoot {
         dark: appSettings.darkTheme
     }
 
+    // ===== Сохранение настроек в ~/.config/hewn/settings.json =====
+    FileView {
+        id: settingsFile
+        path: Quickshell.env("HOME") + "/.config/hewn/settings.json"
+
+        // файла ещё нет (первый запуск): разрешаем запись
+        onLoadFailed: root.settingsReady = true
+
+        onLoaded: {
+            try {
+                const d = JSON.parse(settingsFile.text())
+                if (d.darkTheme !== undefined) appSettings.darkTheme = d.darkTheme
+                if (d.statusbarRounded !== undefined) appSettings.statusbarRounded = d.statusbarRounded
+                if (d.taskbarRounded !== undefined) appSettings.taskbarRounded = d.taskbarRounded
+                if (d.taskbarTextVisible !== undefined) appSettings.taskbarTextVisible = d.taskbarTextVisible
+            } catch (e) {
+                console.log("hewn settings: cannot parse file:", e)
+            }
+            root.settingsReady = true
+        }
+    }
+
+    // пишем в файл только после загрузки, чтобы не затереть сохранённое значениями по умолчанию
+    property bool settingsReady: false
+
+    readonly property string settingsJson: JSON.stringify({
+        darkTheme: appSettings.darkTheme,
+        statusbarRounded: appSettings.statusbarRounded,
+        taskbarRounded: appSettings.taskbarRounded,
+        taskbarTextVisible: appSettings.taskbarTextVisible
+    })
+    onSettingsJsonChanged: if (settingsReady) settingsFile.setText(settingsJson)
+
+    // ===== Окно настроек =====
     property bool settingsOpen: false
 
     LazyLoader {
