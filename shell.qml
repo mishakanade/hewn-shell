@@ -145,8 +145,11 @@ ShellRoot {
                         required property var modelData
                         visible: !(modelData.workspace?.name ?? "").startsWith("special:")
                         title: modelData.title
-                        active: modelData.activated
                         onClicked: modelData.wayland?.activate()
+                        icon: {
+                            DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
+                            return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
+                        }
                     }
                 }
 
@@ -167,6 +170,10 @@ ShellRoot {
                         title: modelData.title
                         active: modelData.activated
                         onClicked: modelData.wayland?.activate()
+                        icon: {
+                            DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
+                            return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
+                        }
                     }
                 }
             }
