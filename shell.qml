@@ -119,6 +119,19 @@ ShellRoot {
         }
     }
 
+    property var activePlayer: {
+        const players = Mpris.players.values
+        let spotify = null
+        let playing = null
+        for (const p of players) {
+            if (p.desktopEntry === "spotify" || p.identity === "Spotify") spotify = p
+            if (p.isPlaying && !playing) playing = p
+        }
+        if (spotify && spotify.isPlaying) return spotify
+        if (playing) return playing
+        return spotify ?? players[0] ?? null
+    }
+
     PanelWindow {
         anchors {
             left: true
