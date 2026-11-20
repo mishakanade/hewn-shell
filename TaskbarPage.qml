@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 
 Rectangle {
     id: page
@@ -42,6 +43,31 @@ Rectangle {
             ToggleSwitch {
                 checked: page.settings.taskbarTextVisible
                 onToggled: page.settings.taskbarTextVisible = !page.settings.taskbarTextVisible
+            }
+        }
+
+        Row {
+            spacing: 12
+
+            Text {
+                text: "Icons position"
+                width: 160
+                color: page.theme.text
+                height: 32
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            ComboBox {
+                width: 160
+                model: [
+                    { text: "Left", value: "left" },
+                    { text: "Center", value: "center" },
+                    { text: "Right", value: "right" }
+                ]
+                textRole: "text"
+                valueRole: "value"
+                currentIndex: indexOfValue(page.settings.taskbarAlign)
+                onActivated: page.settings.taskbarAlign = currentValue
             }
         }
     }

@@ -5,4 +5,5 @@ QtObject {
     property bool statusbarRounded: false
     property bool taskbarRounded: true
     property bool taskbarTextVisible: false
+    property string taskbarAlign: "left"
 }

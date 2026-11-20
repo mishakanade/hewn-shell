@@ -151,9 +151,18 @@ ShellRoot {
             radius: appSettings.taskbarRounded ? 12 : 0
 
             Row {
-                x: 10
+                x: appSettings.taskbarAlign === "center" ? (parent.width - width) / 2
+                 : appSettings.taskbarAlign === "right" ? parent.width - width - 10
+                 : 10
                 spacing: 12
                 anchors.verticalCenter: parent.verticalCenter
+
+                Behavior on x {
+                                    NumberAnimation {
+                                        duration: 200
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
 
                 // основные окна
                 Repeater {
@@ -226,6 +235,7 @@ ShellRoot {
                 if (d.statusbarRounded !== undefined) appSettings.statusbarRounded = d.statusbarRounded
                 if (d.taskbarRounded !== undefined) appSettings.taskbarRounded = d.taskbarRounded
                 if (d.taskbarTextVisible !== undefined) appSettings.taskbarTextVisible = d.taskbarTextVisible
+                if (d.taskbarAlign !== undefined) appSettings.taskbarAlign = d.taskbarAlign
             } catch (e) {
                 console.log("hewn settings: cannot parse file:", e)
             }
@@ -240,7 +250,8 @@ ShellRoot {
         darkTheme: appSettings.darkTheme,
         statusbarRounded: appSettings.statusbarRounded,
         taskbarRounded: appSettings.taskbarRounded,
-        taskbarTextVisible: appSettings.taskbarTextVisible
+        taskbarTextVisible: appSettings.taskbarTextVisible,
+        taskbarAlign: appSettings.taskbarAlign
     })
     onSettingsJsonChanged: if (settingsReady) settingsFile.setText(settingsJson)
 
