@@ -126,37 +126,47 @@ ShellRoot {
             bottom: true
         }
         implicitHeight: 40
-        color: "black"
+        color: "transparent"
 
-        Row {
-            x: 10
-            spacing: 12
-            anchors.verticalCenter: parent.verticalCenter
+        Rectangle {
+            anchors.fill: parent
+            color: "black"
+            radius: appSettings.taskbarRounded ? 12 : 0
 
-            Repeater {
-                model: ToplevelManager.toplevels
+            Row {
+                x: 10
+                spacing: 12
+                anchors.verticalCenter: parent.verticalCenter
+
+                Repeater {
+                    model: Hyprland.toplevels
+
+                    TaskButton {
+                        required property var modelData
+                        visible: !(modelData.workspace?.name ?? "").startsWith("special:")
+                        title: modelData.title
+                        active: modelData.activated
+                        onClicked: modelData.wayland?.activate()
+                    }
+                }
 
                 Rectangle {
-                    id: button
-                    required property var modelData
-                    width: 160
-                    height: 28
-                    radius: 8
-                    color: button.modelData.activated ? "#f5f5f5" : "#808080"
+                    width: 2
+                    height: 20
+                    radius: 1
+                    color: "#808080"
+                    anchors.verticalCenter: parent.verticalCenter
+                }
 
-                    Text {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
-                        verticalAlignment: Text.AlignVCenter
-                        text: button.modelData.title
-                        elide: Text.ElideRight
-                        color: button.modelData.activated ? "black" : "white"
-                    }
+                Repeater {
+                    model: Hyprland.toplevels
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: button.modelData.activate()
+                    TaskButton {
+                        required property var modelData
+                        visible: (modelData.workspace?.name ?? "").startsWith("special:")
+                        title: modelData.title
+                        active: modelData.activated
+                        onClicked: modelData.wayland?.activate()
                     }
                 }
             }
