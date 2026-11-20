@@ -17,7 +17,7 @@ Rectangle {
 
             Text {
                 text: "Rounded corners"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 24
                 verticalAlignment: Text.AlignVCenter
@@ -34,7 +34,7 @@ Rectangle {
 
             Text {
                 text: "Show window titles"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 24
                 verticalAlignment: Text.AlignVCenter
@@ -51,13 +51,14 @@ Rectangle {
 
             Text {
                 text: "Icons position"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 32
                 verticalAlignment: Text.AlignVCenter
             }
 
-            ComboBox {
+            ThemedComboBox {
+                theme: page.theme
                 width: 160
                 model: [
                     { text: "Left", value: "left" },
@@ -66,8 +67,8 @@ Rectangle {
                 ]
                 textRole: "text"
                 valueRole: "value"
-                currentIndex: indexOfValue(page.settings.taskbarAlign)
-                onActivated: page.settings.taskbarAlign = currentValue
+                value: page.settings.taskbarAlign
+                onValueSelected: (v) => page.settings.taskbarAlign = v
             }
         }
 
@@ -76,7 +77,7 @@ Rectangle {
 
             Text {
                 text: "Transparent background"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 24
                 verticalAlignment: Text.AlignVCenter
@@ -93,13 +94,14 @@ Rectangle {
 
             Text {
                 text: "Window preview"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 32
                 verticalAlignment: Text.AlignVCenter
             }
 
-            ComboBox {
+            ThemedComboBox {
+                theme: page.theme
                 width: 160
                 model: [
                     { text: "Off", value: "off" },
@@ -108,8 +110,8 @@ Rectangle {
                 ]
                 textRole: "text"
                 valueRole: "value"
-                currentIndex: indexOfValue(page.settings.taskbarTooltip)
-                onActivated: page.settings.taskbarTooltip = currentValue
+                value: page.settings.taskbarTooltip
+                onValueSelected: (v) => page.settings.taskbarTooltip = v
             }
         }
     }

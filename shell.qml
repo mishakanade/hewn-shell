@@ -179,8 +179,8 @@ ShellRoot {
             anchor.gravity: Edges.Top
             visible: taskbarWindow.hoveredItem !== null && appSettings.taskbarTooltip !== "off"
             color: "transparent"
-            width: tipColumn.implicitWidth + 24
-            height: tipColumn.implicitHeight + 20
+            implicitWidth: tipColumn.implicitWidth + 24
+            implicitHeight: tipColumn.implicitHeight + 20
 
             Rectangle {
                 anchors.fill: parent

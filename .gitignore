@@ -52,3 +52,5 @@ ui_*.h
 .DS_Store
 Thumbs.db
 Desktop.ini
+*.autosave
+*.user

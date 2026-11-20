@@ -17,22 +17,22 @@ Rectangle {
 
             Text {
                 text: "Style"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 32
                 verticalAlignment: Text.AlignVCenter
             }
 
-            ComboBox {
-                width: 160
+            ThemedComboBox {
+                theme: page.theme
                 model: [
                     { text: "Islands", value: "islands" },
                     { text: "Solid bar", value: "bar" }
                 ]
                 textRole: "text"
                 valueRole: "value"
-                currentIndex: indexOfValue(page.settings.statusbarStyle)
-                onActivated: page.settings.statusbarStyle = currentValue
+                value: page.settings.statusbarStyle
+                onValueSelected: (v) => page.settings.statusbarStyle = v
             }
         }
 
@@ -43,7 +43,7 @@ Rectangle {
 
             Text {
                 text: "Rounded islands"
-                width: 160
+                width: 190
                 color: page.theme.text
                 height: 24
                 verticalAlignment: Text.AlignVCenter
