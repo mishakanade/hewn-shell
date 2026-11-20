@@ -163,6 +163,8 @@ ShellRoot {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
                         }
+
+                        showText: appSettings.taskbarTextVisible
                     }
                 }
 
@@ -187,6 +189,8 @@ ShellRoot {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
                         }
+
+                        showText: appSettings.taskbarTextVisible
                     }
                 }
             }
