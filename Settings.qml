@@ -8,4 +8,5 @@ QtObject {
     property string taskbarAlign: "left"
     property bool taskbarTransparent: false
     property string statusbarStyle: "islands"
+    property string taskbarTooltip: "title"
 }

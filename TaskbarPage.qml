@@ -87,5 +87,30 @@ Rectangle {
                 onToggled: page.settings.taskbarTransparent = !page.settings.taskbarTransparent
             }
         }
+
+        Row {
+            spacing: 12
+
+            Text {
+                text: "Window preview"
+                width: 160
+                color: page.theme.text
+                height: 32
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            ComboBox {
+                width: 160
+                model: [
+                    { text: "Off", value: "off" },
+                    { text: "Only text", value: "title" },
+                    { text: "Text + preview", value: "preview" }
+                ]
+                textRole: "text"
+                valueRole: "value"
+                currentIndex: indexOfValue(page.settings.taskbarTooltip)
+                onActivated: page.settings.taskbarTooltip = currentValue
+            }
+        }
     }
 }

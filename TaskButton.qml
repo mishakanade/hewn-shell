@@ -11,6 +11,10 @@ Item {
     width: button.showText ? 160 : 36
     height: button.showText ? 28 : 36
 
+    readonly property bool hovered: hoverHandler.hovered
+
+    HoverHandler { id: hoverHandler }
+
     // фон только в режиме с текстом
     Rectangle {
         anchors.fill: parent

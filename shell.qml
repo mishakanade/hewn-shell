@@ -139,6 +139,7 @@ ShellRoot {
 
     // ===== Таскбар (снизу) =====
     PanelWindow {
+        id: taskbarWindow
         anchors {
             left: true
             right: true
@@ -147,11 +148,80 @@ ShellRoot {
         implicitHeight: 40
         color: "transparent"
 
+        // над какой кнопкой сейчас курсор (для подсказки)
+        property Item hoveredItem: null
+        property string hoveredTitle: ""
+        property var hoveredToplevel: null
+
+        function setHover(item, title, toplevel, on) {
+            if (on) {
+                hoveredItem = item
+                hoveredTitle = title
+                hoveredToplevel = toplevel
+            } else if (hoveredItem === item) {
+                hoveredItem = null
+                hoveredToplevel = null
+            }
+        }
+
+        // привязка сама за кнопкой не ходит, пересчитываем при смене кнопки
+        onHoveredItemChanged: {
+            if (hoveredItem) Qt.callLater(() => tooltip.anchor.updateAnchor())
+        }
+
+        // ===== Подсказка =====
+        PopupWindow {
+            id: tooltip
+            readonly property bool showPreview: appSettings.taskbarTooltip === "preview" && taskbarWindow.hoveredToplevel !== null
+
+            anchor.item: taskbarWindow.hoveredItem
+            anchor.edges: Edges.Top
+            anchor.gravity: Edges.Top
+            visible: taskbarWindow.hoveredItem !== null && appSettings.taskbarTooltip !== "off"
+            color: "transparent"
+            width: tipColumn.implicitWidth + 24
+            height: tipColumn.implicitHeight + 20
+
+            Rectangle {
+                anchors.fill: parent
+                radius: 10
+                color: "#222222"
+
+                Column {
+                    id: tipColumn
+                    anchors.centerIn: parent
+                    spacing: 8
+
+                    ScreencopyView {
+                        id: preview
+                        visible: tooltip.showPreview
+                        // снимаем кадры только пока подсказка открыта в режиме превью
+                        captureSource: tooltip.showPreview && tooltip.visible ? taskbarWindow.hoveredToplevel : null
+                        live: true
+
+                        // вписываем картинку в 240x160, сохраняя пропорции окна
+                        readonly property real fit: hasContent ? Math.min(240 / sourceSize.width, 160 / sourceSize.height) : 1
+                        width: hasContent ? sourceSize.width * fit : 240
+                        height: hasContent ? sourceSize.height * fit : 135
+                    }
+
+                    Text {
+                        id: tipLabel
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: Math.min(implicitWidth, 300)
+                        elide: Text.ElideRight
+                        color: "#ffffff"
+                        text: taskbarWindow.hoveredTitle
+                    }
+                }
+            }
+        }
+
         Rectangle {
             anchors.fill: parent
             color: appSettings.taskbarTransparent ? "transparent" : "black"
-            Behavior on color { ColorAnimation { duration: 200 } }
             radius: appSettings.taskbarRounded ? 12 : 0
+            Behavior on color { ColorAnimation { duration: 200 } }
 
             Row {
                 x: appSettings.taskbarAlign === "center" ? (parent.width - width) / 2
@@ -161,23 +231,25 @@ ShellRoot {
                 anchors.verticalCenter: parent.verticalCenter
 
                 Behavior on x {
-                                    NumberAnimation {
-                                        duration: 200
-                                        easing.type: Easing.OutCubic
-                                    }
-                                }
+                    NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutCubic
+                    }
+                }
 
                 // основные окна
                 Repeater {
                     model: Hyprland.toplevels
 
                     TaskButton {
+                        id: btnMain
                         required property var modelData
                         visible: !(modelData.workspace?.name ?? "").startsWith("special:")
                         title: modelData.title
                         active: modelData.activated
                         showText: appSettings.taskbarTextVisible
                         onClicked: modelData.wayland?.activate()
+                        onHoveredChanged: taskbarWindow.setHover(btnMain, modelData.title, modelData.wayland, hovered)
                         icon: {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
@@ -199,12 +271,14 @@ ShellRoot {
                     model: Hyprland.toplevels
 
                     TaskButton {
+                        id: btnSpecial
                         required property var modelData
                         visible: (modelData.workspace?.name ?? "").startsWith("special:")
                         title: modelData.title
                         active: modelData.activated
                         showText: appSettings.taskbarTextVisible
                         onClicked: modelData.wayland?.activate()
+                        onHoveredChanged: taskbarWindow.setHover(btnSpecial, modelData.title, modelData.wayland, hovered)
                         icon: {
                             DesktopEntries.applications.values   // только чтобы привязка пересчитывалась, когда база загрузится
                             return Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.wayland?.appId ?? "")?.icon ?? "", true)
@@ -241,6 +315,7 @@ ShellRoot {
                 if (d.taskbarAlign !== undefined) appSettings.taskbarAlign = d.taskbarAlign
                 if (d.taskbarTransparent !== undefined) appSettings.taskbarTransparent = d.taskbarTransparent
                 if (d.statusbarStyle !== undefined) appSettings.statusbarStyle = d.statusbarStyle
+                if (d.taskbarTooltip !== undefined) appSettings.taskbarTooltip = d.taskbarTooltip
             } catch (e) {
                 console.log("hewn settings: cannot parse file:", e)
             }
@@ -258,7 +333,8 @@ ShellRoot {
         taskbarTextVisible: appSettings.taskbarTextVisible,
         taskbarAlign: appSettings.taskbarAlign,
         taskbarTransparent: appSettings.taskbarTransparent,
-        statusbarStyle: appSettings.statusbarStyle
+        statusbarStyle: appSettings.statusbarStyle,
+        taskbarTooltip: appSettings.taskbarTooltip
     })
     onSettingsJsonChanged: if (settingsReady) settingsFile.setText(settingsJson)
 
