@@ -69,10 +69,12 @@ ShellRoot {
             right: true
         }
         implicitHeight: 40
+        color: "transparent"
 
         BarContent {
             anchors.fill: parent
             rounded: appSettings.statusbarRounded
+            islands: appSettings.statusbarStyle === "islands"
             timenow: clock.date                      // откуда брать время?
             activeWorkspace: Hyprland.focusedWorkspace ? Hyprland.focusedWorkspace.id: 1      // откуда брать номер стола?
             onWorkspaceClicked: (number) => Hyprland.dispatch("hl.dsp.focus({ workspace = " + number + " })")  // что сделать при клике?
@@ -147,7 +149,8 @@ ShellRoot {
 
         Rectangle {
             anchors.fill: parent
-            color: "black"
+            color: appSettings.taskbarTransparent ? "transparent" : "black"
+            Behavior on color { ColorAnimation { duration: 200 } }
             radius: appSettings.taskbarRounded ? 12 : 0
 
             Row {
@@ -236,6 +239,8 @@ ShellRoot {
                 if (d.taskbarRounded !== undefined) appSettings.taskbarRounded = d.taskbarRounded
                 if (d.taskbarTextVisible !== undefined) appSettings.taskbarTextVisible = d.taskbarTextVisible
                 if (d.taskbarAlign !== undefined) appSettings.taskbarAlign = d.taskbarAlign
+                if (d.taskbarTransparent !== undefined) appSettings.taskbarTransparent = d.taskbarTransparent
+                if (d.statusbarStyle !== undefined) appSettings.statusbarStyle = d.statusbarStyle
             } catch (e) {
                 console.log("hewn settings: cannot parse file:", e)
             }
@@ -251,7 +256,9 @@ ShellRoot {
         statusbarRounded: appSettings.statusbarRounded,
         taskbarRounded: appSettings.taskbarRounded,
         taskbarTextVisible: appSettings.taskbarTextVisible,
-        taskbarAlign: appSettings.taskbarAlign
+        taskbarAlign: appSettings.taskbarAlign,
+        taskbarTransparent: appSettings.taskbarTransparent,
+        statusbarStyle: appSettings.statusbarStyle
     })
     onSettingsJsonChanged: if (settingsReady) settingsFile.setText(settingsJson)
 

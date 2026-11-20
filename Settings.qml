@@ -6,4 +6,6 @@ QtObject {
     property bool taskbarRounded: true
     property bool taskbarTextVisible: false
     property string taskbarAlign: "left"
+    property bool taskbarTransparent: false
+    property string statusbarStyle: "islands"
 }

@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Controls
+import QtQuick.Controls.Basic
 
 Rectangle {
     id: page
@@ -68,6 +68,23 @@ Rectangle {
                 valueRole: "value"
                 currentIndex: indexOfValue(page.settings.taskbarAlign)
                 onActivated: page.settings.taskbarAlign = currentValue
+            }
+        }
+
+        Row {
+            spacing: 12
+
+            Text {
+                text: "Transparent background"
+                width: 160
+                color: page.theme.text
+                height: 24
+                verticalAlignment: Text.AlignVCenter
+            }
+
+            ToggleSwitch {
+                checked: page.settings.taskbarTransparent
+                onToggled: page.settings.taskbarTransparent = !page.settings.taskbarTransparent
             }
         }
     }
